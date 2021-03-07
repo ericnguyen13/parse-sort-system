@@ -1,0 +1,5 @@
+Jones|Eric|ejones@example.com|blue|02/01/1991
+Lewis|Damian|dlewis@example.com|red|02/02/1992
+West|Adam|awest@example.com|green|02/03/1993
+Robinson|Nate|nrobinson@example.com|yellow|02/04/1994
+Buck|Ken|kbuck@example.com|orange|02/05/1995

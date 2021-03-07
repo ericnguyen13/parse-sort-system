@@ -5,7 +5,9 @@ import {
   getRecordWithSpaceDelimiterLine,
   Person,
   PersonProperties,
-  readFileRecord
+  readFileRecord,
+  sortByBirthDateAsc,
+  sortByEmailDescThenLastNameAsc, sortByLastNameDesc
 } from './common-lib';
 
 describe('parse-sort-system', () => {
@@ -110,10 +112,59 @@ describe('parse-sort-system', () => {
         });
       });
 
+      describe('sortByEmailDescThenLastNameAsc', () => {
+        it('should sort the records by email descending, then by lastname ascending correctly', () => {
+
+          // set the same email for the followings
+          // Original order: 1. Nate Robinson, nrobinson@example.com and 2. Ken Buck, kbuck@example.com, ...
+          // After make the same email and we sort by the last name ascending and the order now is
+          // 1. Ken Buck, kbuck@example.com and then 2. Nate Robinson, nrobinson@example.com, ...
+          expectedRecords[3][PersonProperties.EMAIL] = expectedRecords[4][PersonProperties.EMAIL] = 'thesame@example.com';
+
+          const sortedByEmailDescThenByLastnameAsc =
+            sortByEmailDescThenLastNameAsc(expectedRecords);
+
+          expect(sortedByEmailDescThenByLastnameAsc).toEqual([
+            expectedRecords[4],
+            expectedRecords[3],
+            expectedRecords[0],
+            expectedRecords[1],
+            expectedRecords[2]
+          ]);
+        });
+      });
+
+      describe('sortByBirthDateAsc', () => {
+        it('should sort the records by birth date ascending correctly', () => {
+          const ascSortedByBirthDate = sortByBirthDateAsc(expectedRecords);
+          expect(ascSortedByBirthDate).toEqual([
+            expectedRecords[0],
+            expectedRecords[1],
+            expectedRecords[2],
+            expectedRecords[3],
+            expectedRecords[4],
+          ]);
+        });
+      });
+
+      describe('sortByLastNameDesc', () => {
+        it('should sort the records by lastname descending correctly', () => {
+          const ascSortedByBirthDate = sortByLastNameDesc(expectedRecords);
+          expect(ascSortedByBirthDate).toEqual([
+            expectedRecords[2],
+            expectedRecords[3],
+            expectedRecords[1],
+            expectedRecords[0],
+            expectedRecords[4],
+          ]);
+        });
+      });
+
       describe('readFileRecord', () => {
-        const spaceDelimiterRecordsFile = `${__dirname}/../data/records-with-space-delimiter.txt`;
-        const commaDelimiterRecordsFile = `${__dirname}/../data/records-with-comma-delimiter.txt`;
-        const pipeDelimiterRecordsFile = `${__dirname}/../data/records-with-pipe-delimiter.txt`;
+        const rootProject = `${__dirname}/../../../../`;
+        const spaceDelimiterRecordsFile = `${rootProject}data/records-with-space-delimiter.txt`;
+        const commaDelimiterRecordsFile = `${rootProject}data/records-with-comma-delimiter.txt`;
+        const pipeDelimiterRecordsFile = `${rootProject}data/records-with-pipe-delimiter.txt`;
 
         it('should read a file of records that has space delimiter for each field correctly', async () => {
           const records = await readFileRecord(spaceDelimiterRecordsFile, Delimiter.SPACE);

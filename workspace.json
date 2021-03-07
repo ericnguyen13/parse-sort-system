@@ -37,57 +37,6 @@
         }
       }
     },
-    "command-line": {
-      "root": "apps/command-line",
-      "sourceRoot": "apps/command-line/src",
-      "projectType": "application",
-      "prefix": "command-line",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/command-line",
-            "main": "apps/command-line/src/main.ts",
-            "tsConfig": "apps/command-line/tsconfig.app.json",
-            "assets": ["apps/command-line/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/command-line/src/environments/environment.ts",
-                  "with": "apps/command-line/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "command-line:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/command-line/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/command-line"],
-          "options": {
-            "jestConfig": "apps/command-line/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "api": {
       "root": "apps/api",
       "sourceRoot": "apps/api/src",

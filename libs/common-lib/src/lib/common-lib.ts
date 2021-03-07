@@ -1,5 +1,10 @@
 import * as lineReader from 'line-reader';
 
+export enum SortDirection {
+  DESCENDING = 'descending',
+  ASCENDING = 'ascending',
+}
+
 export enum Delimiter {
   COMMA = 'comma',
   PIPE = 'pipe',
@@ -55,6 +60,37 @@ export function parseLineOfRecords(line: string, delimiter: Delimiter): Person {
   };
 }
 
+function descendingCompare<T>(first: T, second: T): number {
+  return second > first ? 1 : -1;
+}
+
+function ascendingCompare<T>(first: T, second: T): number {
+  return first > second ? 1 : -1;
+}
+
+export function sortByEmailDescThenLastNameAsc(records: Array<Person>): Array<Person> {
+  return [...records].sort((a, b) => {
+    if (a[PersonProperties.EMAIL] === b[PersonProperties.EMAIL]) {
+      return ascendingCompare(a[PersonProperties.LAST_NAME], b[PersonProperties.LAST_NAME]);
+    }
+
+    return descendingCompare(a[PersonProperties.EMAIL], b[PersonProperties.EMAIL]);
+  });
+}
+
+export function sortByBirthDateAsc(records: Array<Person>): Array<Person> {
+  return [...records].sort((a, b) =>
+    ascendingCompare(new Date(a[PersonProperties.DATE_OF_BIRTH]), new Date(b[PersonProperties.DATE_OF_BIRTH]))
+  );
+}
+
+export function sortByLastNameDesc(records: Array<Person>): Array<Person> {
+  return [...records].sort((a, b) =>
+    descendingCompare(a[PersonProperties.LAST_NAME], b[PersonProperties.LAST_NAME])
+  );
+}
+
+
 export async function readFileRecord(fileName: string, delimiter: Delimiter): Promise<Array<Person>> {
   const records: Array<Person> = [];
   return new Promise((resolve, reject) => {
@@ -69,7 +105,7 @@ export async function readFileRecord(fileName: string, delimiter: Delimiter): Pr
             // assume the line is always valid here.
             // but we can handle the error if being asked.
             if (!error) {
-              records.push(parseLineOfRecords(line, delimiter));
+              records.push(parseLineOfRecords(line as string, delimiter));
             } else {
               reject(error);
             }

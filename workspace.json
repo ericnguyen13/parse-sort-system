@@ -13,12 +13,16 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/common-lib/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/common-lib/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/common-lib"],
+          "outputs": [
+            "coverage/libs/common-lib"
+          ],
           "options": {
             "jestConfig": "libs/common-lib/jest.config.js",
             "passWithNoTests": true
@@ -26,13 +30,17 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/libs/common-lib",
             "tsConfig": "libs/common-lib/tsconfig.lib.json",
             "packageJson": "libs/common-lib/package.json",
             "main": "libs/common-lib/src/index.ts",
-            "assets": ["libs/common-lib/*.md"]
+            "assets": [
+              "libs/common-lib/*.md"
+            ]
           }
         }
       }
@@ -45,24 +53,19 @@
       "targets": {
         "build": {
           "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
+          "outputs": [
+            "{options.outputPath}"
+          ],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
-            "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "tsConfig": "apps/api/tsconfig.app.json"
           },
           "configurations": {
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/api/src/environments/environment.ts",
-                  "with": "apps/api/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -75,14 +78,62 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/api/**/*.ts"]
+            "lintFilePatterns": [
+              "apps/api/**/*.ts"
+            ]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/api"],
+          "outputs": [
+            "coverage/apps/api"
+          ],
           "options": {
             "jestConfig": "apps/api/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "parser-cli": {
+      "root": "apps/parser-cli",
+      "sourceRoot": "apps/parser-cli/src",
+      "projectType": "application",
+      "prefix": "parser-cli",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/apps/parser-cli",
+            "main": "apps/parser-cli/src/main.ts",
+            "tsConfig": "apps/parser-cli/tsconfig.app.json"
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/parser-cli/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/parser-cli"
+          ],
+          "options": {
+            "jestConfig": "apps/parser-cli/jest.config.js",
             "passWithNoTests": true
           }
         }

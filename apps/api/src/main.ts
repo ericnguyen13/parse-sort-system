@@ -4,15 +4,24 @@
  */
 
 import * as express from 'express';
+import {NextFunction, Request, Response} from 'express';
+import { json } from 'body-parser';
 
-const app = express();
+export const app = express();
 
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to service-api!' });
+import recordRoutes from './routes/records';
+
+app.use(json());
+
+app.use('/records', recordRoutes);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  res.status(500).json({ message: err.message });
 });
 
+
 const port = process.env.port || 3333;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+export const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}`);
 });
 server.on('error', console.error);

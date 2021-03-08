@@ -1,13 +1,15 @@
 import {
-  Delimiter,
   getRecordWithCommaDelimiterLine,
   getRecordWithPipeDelimiterLine,
   getRecordWithSpaceDelimiterLine,
   Person,
-  PersonProperties,
+  PersonProperty,
   readFileRecord,
   sortByBirthDateAsc,
-  sortByEmailDescThenLastNameAsc, sortByLastNameDesc
+  sortByEmailDescThenLastNameAsc,
+  sortByLastNameDesc,
+  sortByProperty,
+  SortDirection
 } from './common-lib';
 
 describe('parse-sort-system', () => {
@@ -16,39 +18,39 @@ describe('parse-sort-system', () => {
 
       const expectedRecords: Array<Person> = [
         {
-          [PersonProperties.LAST_NAME]: 'Jones',
-          [PersonProperties.FIRST_NAME]: 'Eric',
-          [PersonProperties.EMAIL]: 'ejones@example.com',
-          [PersonProperties.FAVORITE_COLOR]: 'blue',
-          [PersonProperties.DATE_OF_BIRTH]: '02/01/1991'
+          [PersonProperty.LAST_NAME]: 'Jones',
+          [PersonProperty.FIRST_NAME]: 'Eric',
+          [PersonProperty.EMAIL]: 'ejones@example.com',
+          [PersonProperty.FAVORITE_COLOR]: 'blue',
+          [PersonProperty.DATE_OF_BIRTH]: '02/01/1991'
         },
         {
-          [PersonProperties.LAST_NAME]: 'Lewis',
-          [PersonProperties.FIRST_NAME]: 'Damian',
-          [PersonProperties.EMAIL]: 'dlewis@example.com',
-          [PersonProperties.FAVORITE_COLOR]: 'red',
-          [PersonProperties.DATE_OF_BIRTH]: '02/02/1992'
+          [PersonProperty.LAST_NAME]: 'Lewis',
+          [PersonProperty.FIRST_NAME]: 'Damian',
+          [PersonProperty.EMAIL]: 'dlewis@example.com',
+          [PersonProperty.FAVORITE_COLOR]: 'red',
+          [PersonProperty.DATE_OF_BIRTH]: '02/02/1992'
         },
         {
-          [PersonProperties.LAST_NAME]: 'West',
-          [PersonProperties.FIRST_NAME]: 'Adam',
-          [PersonProperties.EMAIL]: 'awest@example.com',
-          [PersonProperties.FAVORITE_COLOR]: 'green',
-          [PersonProperties.DATE_OF_BIRTH]: '02/03/1993'
+          [PersonProperty.LAST_NAME]: 'West',
+          [PersonProperty.FIRST_NAME]: 'Adam',
+          [PersonProperty.EMAIL]: 'awest@example.com',
+          [PersonProperty.FAVORITE_COLOR]: 'green',
+          [PersonProperty.DATE_OF_BIRTH]: '02/03/1993'
         },
         {
-          [PersonProperties.LAST_NAME]: 'Robinson',
-          [PersonProperties.FIRST_NAME]: 'Nate',
-          [PersonProperties.EMAIL]: 'nrobinson@example.com',
-          [PersonProperties.FAVORITE_COLOR]: 'yellow',
-          [PersonProperties.DATE_OF_BIRTH]: '02/04/1994'
+          [PersonProperty.LAST_NAME]: 'Robinson',
+          [PersonProperty.FIRST_NAME]: 'Nate',
+          [PersonProperty.EMAIL]: 'nrobinson@example.com',
+          [PersonProperty.FAVORITE_COLOR]: 'yellow',
+          [PersonProperty.DATE_OF_BIRTH]: '02/04/1994'
         },
         {
-          [PersonProperties.LAST_NAME]: 'Buck',
-          [PersonProperties.FIRST_NAME]: 'Ken',
-          [PersonProperties.EMAIL]: 'kbuck@example.com',
-          [PersonProperties.FAVORITE_COLOR]: 'orange',
-          [PersonProperties.DATE_OF_BIRTH]: '02/05/1995'
+          [PersonProperty.LAST_NAME]: 'Buck',
+          [PersonProperty.FIRST_NAME]: 'Ken',
+          [PersonProperty.EMAIL]: 'kbuck@example.com',
+          [PersonProperty.FAVORITE_COLOR]: 'orange',
+          [PersonProperty.DATE_OF_BIRTH]: '02/05/1995'
         }
       ];
 
@@ -119,17 +121,47 @@ describe('parse-sort-system', () => {
           // Original order: 1. Nate Robinson, nrobinson@example.com and 2. Ken Buck, kbuck@example.com, ...
           // After make the same email and we sort by the last name ascending and the order now is
           // 1. Ken Buck, kbuck@example.com and then 2. Nate Robinson, nrobinson@example.com, ...
-          expectedRecords[3][PersonProperties.EMAIL] = expectedRecords[4][PersonProperties.EMAIL] = 'thesame@example.com';
+          expectedRecords[3][PersonProperty.EMAIL] = expectedRecords[4][PersonProperty.EMAIL] = 'makethesame@example.com';
 
           const sortedByEmailDescThenByLastnameAsc =
             sortByEmailDescThenLastNameAsc(expectedRecords);
 
           expect(sortedByEmailDescThenByLastnameAsc).toEqual([
-            expectedRecords[4],
-            expectedRecords[3],
-            expectedRecords[0],
-            expectedRecords[1],
-            expectedRecords[2]
+            {
+              "dateOfBirth": "02/05/1995",
+              "email": "makethesame@example.com",
+              "favoriteColor": "orange",
+              "firstName": "Ken",
+              "lastName": "Buck"
+            },
+            {
+              "dateOfBirth": "02/04/1994",
+              "email": "makethesame@example.com",
+              "favoriteColor": "yellow",
+              "firstName": "Nate",
+              "lastName": "Robinson"
+            },
+            {
+              "dateOfBirth": "02/01/1991",
+              "email": "ejones@example.com",
+              "favoriteColor": "blue",
+              "firstName": "Eric",
+              "lastName": "Jones"
+            },
+            {
+              "dateOfBirth": "02/02/1992",
+              "email": "dlewis@example.com",
+              "favoriteColor": "red",
+              "firstName": "Damian",
+              "lastName": "Lewis"
+            },
+            {
+              "dateOfBirth": "02/03/1993",
+              "email": "awest@example.com",
+              "favoriteColor": "green",
+              "firstName": "Adam",
+              "lastName": "West"
+            }
           ]);
         });
       });
@@ -138,11 +170,41 @@ describe('parse-sort-system', () => {
         it('should sort the records by birth date ascending correctly', () => {
           const ascSortedByBirthDate = sortByBirthDateAsc(expectedRecords);
           expect(ascSortedByBirthDate).toEqual([
-            expectedRecords[0],
-            expectedRecords[1],
-            expectedRecords[2],
-            expectedRecords[3],
-            expectedRecords[4],
+            {
+              "dateOfBirth": "02/01/1991",
+              "email": "ejones@example.com",
+              "favoriteColor": "blue",
+              "firstName": "Eric",
+              "lastName": "Jones"
+            },
+            {
+              "dateOfBirth": "02/02/1992",
+              "email": "dlewis@example.com",
+              "favoriteColor": "red",
+              "firstName": "Damian",
+              "lastName": "Lewis"
+            },
+            {
+              "dateOfBirth": "02/03/1993",
+              "email": "awest@example.com",
+              "favoriteColor": "green",
+              "firstName": "Adam",
+              "lastName": "West"
+            },
+            {
+              "dateOfBirth": "02/04/1994",
+              "email": "makethesame@example.com",
+              "favoriteColor": "yellow",
+              "firstName": "Nate",
+              "lastName": "Robinson"
+            },
+            {
+              "dateOfBirth": "02/05/1995",
+              "email": "makethesame@example.com",
+              "favoriteColor": "orange",
+              "firstName": "Ken",
+              "lastName": "Buck"
+            }
           ]);
         });
       });
@@ -151,14 +213,87 @@ describe('parse-sort-system', () => {
         it('should sort the records by lastname descending correctly', () => {
           const ascSortedByBirthDate = sortByLastNameDesc(expectedRecords);
           expect(ascSortedByBirthDate).toEqual([
-            expectedRecords[2],
-            expectedRecords[3],
-            expectedRecords[1],
-            expectedRecords[0],
-            expectedRecords[4],
+            {
+              "dateOfBirth": "02/03/1993",
+              "email": "awest@example.com",
+              "favoriteColor": "green",
+              "firstName": "Adam",
+              "lastName": "West"
+            },
+            {
+              "dateOfBirth": "02/04/1994",
+              "email": "makethesame@example.com",
+              "favoriteColor": "yellow",
+              "firstName": "Nate",
+              "lastName": "Robinson"
+            },
+            {
+              "dateOfBirth": "02/02/1992",
+              "email": "dlewis@example.com",
+              "favoriteColor": "red",
+              "firstName": "Damian",
+              "lastName": "Lewis"
+            },
+            {
+              "dateOfBirth": "02/01/1991",
+              "email": "ejones@example.com",
+              "favoriteColor": "blue",
+              "firstName": "Eric",
+              "lastName": "Jones"
+            },
+            {
+              "dateOfBirth": "02/05/1995",
+              "email": "makethesame@example.com",
+              "favoriteColor": "orange",
+              "firstName": "Ken",
+              "lastName": "Buck"
+            }
           ]);
         });
       });
+
+      describe('sortByProperty', () => {
+        it('should sort the records by the specified property and direction', () => {
+          const ascSortedByFirstName = sortByProperty(expectedRecords, PersonProperty.FIRST_NAME, SortDirection.ASCENDING);
+          expect(ascSortedByFirstName).toEqual([
+            {
+              "dateOfBirth": "02/03/1993",
+              "email": "awest@example.com",
+              "favoriteColor": "green",
+              "firstName": "Adam",
+              "lastName": "West"
+            },
+            {
+              "dateOfBirth": "02/02/1992",
+              "email": "dlewis@example.com",
+              "favoriteColor": "red",
+              "firstName": "Damian",
+              "lastName": "Lewis"
+            },
+            {
+              "dateOfBirth": "02/01/1991",
+              "email": "ejones@example.com",
+              "favoriteColor": "blue",
+              "firstName": "Eric",
+              "lastName": "Jones"
+            },
+            {
+              "dateOfBirth": "02/05/1995",
+              "email": "makethesame@example.com",
+              "favoriteColor": "orange",
+              "firstName": "Ken",
+              "lastName": "Buck"
+            },
+            {
+              "dateOfBirth": "02/04/1994",
+              "email": "makethesame@example.com",
+              "favoriteColor": "yellow",
+              "firstName": "Nate",
+              "lastName": "Robinson"
+            }
+          ]);
+        });
+      })
 
       describe('readFileRecord', () => {
         const rootProject = `${__dirname}/../../../../`;
@@ -167,17 +302,17 @@ describe('parse-sort-system', () => {
         const pipeDelimiterRecordsFile = `${rootProject}data/records-with-pipe-delimiter.txt`;
 
         it('should read a file of records that has space delimiter for each field correctly', async () => {
-          const records = await readFileRecord(spaceDelimiterRecordsFile, Delimiter.SPACE);
+          const records = await readFileRecord(spaceDelimiterRecordsFile);
           expect(expectedRecords).toEqual(records);
         });
 
         it('should read a file of records that has comma delimiter for each field correctly', async () => {
-          const records = await readFileRecord(commaDelimiterRecordsFile, Delimiter.COMMA);
+          const records = await readFileRecord(commaDelimiterRecordsFile);
           expect(expectedRecords).toEqual(records);
         });
 
         it('should read a file of records that has pipe delimiter for each field correctly', async () => {
-          const records = await readFileRecord(pipeDelimiterRecordsFile, Delimiter.PIPE);
+          const records = await readFileRecord(pipeDelimiterRecordsFile);
           expect(expectedRecords).toEqual(records);
         });
       });

@@ -17,7 +17,7 @@ export const DELIMITER_MAP = {
   [Delimiter.SPACE]: ' ',
 }
 
-export enum PersonProperties {
+export enum PersonProperty {
   LAST_NAME = 'lastName',
   FIRST_NAME = 'firstName',
   EMAIL = 'email',
@@ -26,11 +26,11 @@ export enum PersonProperties {
 }
 
 export interface Person {
-  [PersonProperties.LAST_NAME]: string;
-  [PersonProperties.FIRST_NAME]: string;
-  [PersonProperties.EMAIL]: string;
-  [PersonProperties.FAVORITE_COLOR]: string;
-  [PersonProperties.DATE_OF_BIRTH]: string;
+  [PersonProperty.LAST_NAME]: string;
+  [PersonProperty.FIRST_NAME]: string;
+  [PersonProperty.EMAIL]: string;
+  [PersonProperty.FAVORITE_COLOR]: string;
+  [PersonProperty.DATE_OF_BIRTH]: string;
 }
 
 export function getRecordWithSpaceDelimiterLine(line: string): Person {
@@ -52,11 +52,11 @@ export function parseLineOfRecords(line: string, delimiter: Delimiter): Person {
   // LastName, FirstName, Email, FavoriteColor, DateOfBirth
   const splitter = line.split(DELIMITER_MAP[delimiter]);
   return {
-    [PersonProperties.LAST_NAME]: splitter[0],
-    [PersonProperties.FIRST_NAME]: splitter[1],
-    [PersonProperties.EMAIL]: splitter[2],
-    [PersonProperties.FAVORITE_COLOR]: splitter[3],
-    [PersonProperties.DATE_OF_BIRTH]: splitter[4],
+    [PersonProperty.LAST_NAME]: splitter[0],
+    [PersonProperty.FIRST_NAME]: splitter[1],
+    [PersonProperty.EMAIL]: splitter[2],
+    [PersonProperty.FAVORITE_COLOR]: splitter[3],
+    [PersonProperty.DATE_OF_BIRTH]: splitter[4],
   };
 }
 
@@ -70,28 +70,34 @@ function ascendingCompare<T>(first: T, second: T): number {
 
 export function sortByEmailDescThenLastNameAsc(records: Array<Person>): Array<Person> {
   return [...records].sort((a, b) => {
-    if (a[PersonProperties.EMAIL] === b[PersonProperties.EMAIL]) {
-      return ascendingCompare(a[PersonProperties.LAST_NAME], b[PersonProperties.LAST_NAME]);
+    if (a[PersonProperty.EMAIL] === b[PersonProperty.EMAIL]) {
+      return ascendingCompare(a[PersonProperty.LAST_NAME], b[PersonProperty.LAST_NAME]);
     }
 
-    return descendingCompare(a[PersonProperties.EMAIL], b[PersonProperties.EMAIL]);
+    return descendingCompare(a[PersonProperty.EMAIL], b[PersonProperty.EMAIL]);
   });
 }
 
 export function sortByBirthDateAsc(records: Array<Person>): Array<Person> {
   return [...records].sort((a, b) =>
-    ascendingCompare(new Date(a[PersonProperties.DATE_OF_BIRTH]), new Date(b[PersonProperties.DATE_OF_BIRTH]))
+    ascendingCompare(new Date(a[PersonProperty.DATE_OF_BIRTH]), new Date(b[PersonProperty.DATE_OF_BIRTH]))
   );
 }
 
 export function sortByLastNameDesc(records: Array<Person>): Array<Person> {
   return [...records].sort((a, b) =>
-    descendingCompare(a[PersonProperties.LAST_NAME], b[PersonProperties.LAST_NAME])
+    descendingCompare(a[PersonProperty.LAST_NAME], b[PersonProperty.LAST_NAME])
   );
 }
 
+export function sortByProperty(records: Array<Person>, property: PersonProperty, sortDirection: SortDirection): Array<Person> {
+  const sortCompare = sortDirection === SortDirection.ASCENDING ? ascendingCompare : descendingCompare;
+  return [...records]
+    .sort((a, b) => sortCompare(a[property], b[property]));
+}
 
-export async function readFileRecord(fileName: string, delimiter: Delimiter): Promise<Array<Person>> {
+
+export async function readFileRecord(fileName: string): Promise<Array<Person>> {
   const records: Array<Person> = [];
   return new Promise((resolve, reject) => {
     lineReader.open(fileName, (err, reader) => {
@@ -99,8 +105,12 @@ export async function readFileRecord(fileName: string, delimiter: Delimiter): Pr
       // assume the file is always valid here.
       // but we can handle the error if being asked.
       if (!err) {
+        let delimiter;
         while (reader.hasNextLine()) {
           reader.nextLine((error, line) => {
+            if (!delimiter) {
+              delimiter = getDelimiter(line, 5);
+            }
 
             // assume the line is always valid here.
             // but we can handle the error if being asked.
@@ -118,4 +128,32 @@ export async function readFileRecord(fileName: string, delimiter: Delimiter): Pr
       }
     });
   });
+}
+
+export function getDelimiter(line: string, numberOfFields: number): Delimiter {
+  let splitter = line.split(DELIMITER_MAP[Delimiter.SPACE]);
+  if (splitter.length === numberOfFields) {
+    return Delimiter.SPACE;
+  }
+
+  splitter = line.split(DELIMITER_MAP[Delimiter.COMMA]);
+  if (splitter.length === numberOfFields) {
+    return Delimiter.COMMA;
+  }
+
+  splitter = line.split(DELIMITER_MAP[Delimiter.PIPE]);
+  if (splitter.length === numberOfFields) {
+    return Delimiter.PIPE;
+  }
+
+  throw new Error('Line of fields is delimited with the character that does not support by the parse system');
+}
+
+export function getSortDirection(direction: string): SortDirection {
+  const lowerCase = direction.toLowerCase();
+  if (lowerCase === 'desc' || lowerCase === 'descending') {
+    return SortDirection.DESCENDING;
+  }
+
+  return SortDirection.ASCENDING;
 }
